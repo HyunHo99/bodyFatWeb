@@ -1,0 +1,277 @@
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/cropper/2.3.4/cropper.min.css"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+		/>
+		<link rel="stylesheet" href="style.css" />
+		<section id="section02" class="demo sec2">
+			<div id="sec2box">
+				<h7
+					class="title"
+					style="
+						position: absolute;
+						margin-top: 4%;
+						left: 50%;
+						z-index: 2;
+						-webkit-transform: translate(-50%, -50%);
+						transform: translate(-50%, -50%);
+						color: #fff;
+						font: normal 270%/1 'ROKABold', sans-serif;
+						text-align: center;
+						white-space: nowrap;
+					"
+					>CHECK YOUR BODYFAT</h7
+				>
+				<h8
+					class="subtitle"
+					style="
+						position: absolute;
+						margin-top: 8%;
+						left: 50%;
+						z-index: 2;
+						-webkit-transform: translate(-50%, -50%);
+						transform: translate(-50%, -50%);
+						color: #fff;
+						font: normal 70%/1 'ROKABold', sans-serif;
+						font-size: 100%;
+						line-height: 220%;
+						text-align: center;
+						white-space: nowrap;
+					"
+				>
+					<br />당신의 눈바디를 AI가 측정해줍니다. <br />사용자의 사진을 포함한 모든
+					정보는 그 어디에도 저장되지 않습니다.</h8
+				>
+				<div
+					class="image"
+					style="
+						margin-top: 6%;
+						padding-left: 35%;
+						padding-top: 3%;
+						width: 10%;
+						z-index: 1;
+					"
+				>
+					<img src="front.PNG" />
+				</div>
+				<div
+					class="image"
+					style="
+						margin-top: 6%;
+						padding-left: 55%;
+						padding-top: 3%;
+						width: 10%;
+						z-index: 1;
+					"
+				>
+					<img src="back.PNG" />
+				</div>
+				<h8
+					class="subtitle"
+					style="
+						position: absolute;
+						margin-top: 28%;
+						left: 50%;
+						z-index: 2;
+						-webkit-transform: translate(-50%, -50%);
+						transform: translate(-50%, -50%);
+						color: #000;
+						font: normal 100%/1 'ROKABold', sans-serif;
+						font-size: 100%;
+						line-height: 220%;
+						text-align: center;
+						white-space: nowrap;
+					"
+					>몸의 앞쪽이 정면으로 나온 사진을 준비합니다.</h8
+				>
+				<div
+					class="image"
+					style="
+						margin-top: 24%;
+						padding-left: 45%;
+						padding-top: 3%;
+						width: 10%;
+						z-index: 1;
+					"
+				>
+					<img src="cropimg.png" />
+				</div>
+				<h9
+					class="subtitle"
+					style="
+						position: absolute;
+						margin-top: 46%;
+						left: 50%;
+						z-index: 2;
+						-webkit-transform: translate(-50%, -50%);
+						transform: translate(-50%, -50%);
+						color: #000;
+						font: normal 100%/1 'ROKABold', sans-serif;
+						font-size: 100%;
+						line-height: 220%;
+						text-align: center;
+						white-space: nowrap;
+					"
+					>정확한 측정을 위해서, 사진을 어깨부터 골반까지만 나오게 자릅니다.</h9
+				>
+			</div>
+		</section>
+	</head>
+	<body>
+		<div class="container">
+			<div class="imagebox">
+				<!-- leftbox -->
+
+				<input type="file" id="file-input" />
+				<div class="photo">
+					<img class="upload" src="photo.png" />
+					<h1>UPLOAD YOUR PHOTO</h1>
+				</div>
+
+				<div class="cropBox hide">
+					<div class="result hide"></div>
+					<button class="btn save hide">CUT</button>
+					<img class="cropped hide" id="cropped" src="" alt="" />
+					<button type="button" id="predictBt" class="btn hide" onclick="predict()">
+						CHECK!
+					</button>
+					<img class="loading hide" src="Spinner.gif" />
+					<div id="label-container"></div>
+				</div>
+				<!-- <div class="box-2 img-result hide"> -->
+
+				<!-- </div> -->
+
+				<!-- input file -->
+				<!-- save btn -->
+				<!-- download btn -->
+			</div>
+		</div>
+		<script>
+			window.onload = function () {
+				init();
+			};
+		</script>
+
+		<script>
+			// vars
+			let result = document.querySelector('.result'),
+				img_result = document.querySelector('#cropped'),
+				img_w = document.querySelector('.img-w'),
+				img_h = document.querySelector('.img-h'),
+				save = document.querySelector('.save'),
+				cropped = document.querySelector('.cropped'),
+				dwn = document.querySelector('.download'),
+				upload = document.querySelector('#file-input'),
+				cropper = '';
+
+			// on change show image with crop options
+			upload.addEventListener('change', (e) => {
+				if (e.target.files.length) {
+					// start file reader
+					const reader = new FileReader();
+					reader.onload = (e) => {
+						if (e.target.result) {
+							// create new image
+							let img = document.createElement('img');
+							img.id = 'image';
+							img.src = e.target.result;
+							// clean result before
+							result.innerHTML = '';
+							// append new image
+							upload.classList.add('hide');
+							result.appendChild(img);
+							result.classList.remove('hide');
+							// show save btn and options
+							document.querySelector('.photo').classList.add('hide');
+							document.querySelector('.cropBox').classList.remove('hide');
+							save.classList.remove('hide');
+							// init cropper
+							cropper = new Cropper(img, {zoomOnWheel : false});
+						}
+					};
+					reader.readAsDataURL(e.target.files[0]);
+				}
+			});
+
+			console.log(save);
+			// save on click
+			save.addEventListener('click', (e) => {
+				console.log(save);
+				e.preventDefault();
+				// get result to data uri
+				let imgSrc = cropper.getCroppedCanvas().toDataURL();
+				// remove hide class of img
+				result.classList.add('hide');
+				save.classList.add('hide');
+				cropped.classList.remove('hide');
+				img_result.classList.remove('hide');
+				predictBt.classList.remove('hide');
+				// show image cropped
+				cropped.src = imgSrc;
+			});
+			console.log(save);
+		</script>
+
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+		<script type="text/javascript">
+			// More API functions here:
+			// https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
+
+			// the link to your model provided by Teachable Machine export panel
+			const URL = 'https://checkbodyfatmodel.netlify.app/';
+
+			let model, labelContainer, maxPredictions;
+			var a = 1;
+
+			// Load the image model and setup the webcam
+			async function init() {
+				const modelURL = URL + 'model.json';
+
+				model = await tf.loadLayersModel(modelURL);
+				var predictBt = document.getElementById('predictBt');
+
+				labelContainer = document.getElementById('label-container');
+				labelContainer.appendChild(document.createElement('div'));
+			}
+
+			// run the webcam image through the image model
+			async function predict() {
+				//var labelContainer = document.getElementById('label-container');
+				var loading = document.querySelector('.loading');
+				loading.classList.remove('hide');
+				predictBt.classList.add('hide');
+				var image = document.getElementById('cropped');
+				const inputTensor = tf.browser.fromPixels(image);
+				const b = tf.scalar(255.0);
+				var k = tf.cast(inputTensor, 'float32').resizeBilinear([224, 224]);
+				var input = k.div(b);
+				let result = model.predict(input.reshape([1, 224, 224, 3]));
+				loading.classList.add('hide');
+				labelContainer.childNodes[0].innerHTML =
+					'제가봤을 때는 ' + parseInt(result.arraySync()[0]) + '%정도 인것 같네요!';
+			}
+		</script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/0.8.1/cropper.min.js"></script>
+	</body>
+	<!--Copyright (c) 2021 by Aaron Vanston (https://codepen.io/aaronvanston/pen/yNYOXR)
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+	<!-- Copyright (c) 2021 by Narendra (https://codepen.io/Narendrakaduru/pen/oWevXY)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
+</html>
